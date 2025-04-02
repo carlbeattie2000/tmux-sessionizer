@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/usr/bin/env bash
 
 HOME=~/
 PERSONAL=~/personal
@@ -34,11 +34,9 @@ create-windows() {
   tmux rename-window -t $1:1 'nvim'
   tmux send-keys -t $1:1 'vim .' C-m
 
-  tmux new-window -t $1 -n 'long-running'
-  tmux new-window -t $1 -n 'cmd'
-  tmux new-window -t $1 -n 'exta'
-
-  tmux select-window -t $1:1
+  tmux new-window -t $1 -dn 'long-running' -c $2
+  tmux new-window -t $1 -dn 'cmd' -c $2
+  tmux new-window -t $1 -dn 'exta' -c $2
 }
 
 session_dir=$(find $HOME $PERSONAL $CONFIG -mindepth 1 -maxdepth 1 -type d | fzf)
@@ -48,14 +46,15 @@ fi
 session_name=$(basename "$session_dir" | tr . _)
 
 if ! tmux-active; then
-  tmux new-session -s $session_name -c $session_dir
-  create-windows $session_name
+  tmux new-session -ds $session_name -c $session_dir
+  create-windows $session_name $session_dir
+  tmux attach -t $session_name
   exit 0
 fi
 
 if ! has-session $session_name; then
   tmux new-session -ds $session_name -c $session_dir
-  create-windows $session_name
+  create-windows $session_name $session_dir
 fi
 
 switch-session $session_name
