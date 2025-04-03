@@ -5,12 +5,7 @@ PERSONAL=~/personal
 CONFIG=~/.config
 
 tmux-active() {
-  tmux_running=$(pgrep tmux)
-  if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    false
-  else
-    true
-  fi
+  [[ -n $TMUX || -n $(pgrep tmux) ]]
 }
 
 switch-session() {
@@ -22,14 +17,13 @@ switch-session() {
 }
 
 has-session() {
-  tmux list-sessions | awk -F: '{print $1}' | grep -m1 "$1" > /dev/null
+  tmux list-sessions | grep "^$1:"
 }
 
-# Populate tmux session with windows
-# Window 1 -> nvim
-# Window 2 -> long running processes
-# Window 3 -> cmd eg. git
-# Window 4 -> extras / spare
+find-session() {
+  tmux list-sessions | awk -F: '{print $1}' | grep "$1"
+}
+
 create-windows() {
   tmux rename-window -t $1:1 'nvim'
   tmux send-keys -t $1:1 'vim .' C-m
@@ -39,10 +33,26 @@ create-windows() {
   tmux new-window -t $1 -dn 'extra' -c $2
 }
 
+partial-match-search() {
+  matches=$(find-session "$1")
+
+  if [[ -z "$matches" ]]; then
+    echo "$1"
+    return
+  fi
+
+  selected=$(echo -e "$matches\nCreate new session: $1" | fzf)
+
+  if [[ "$selected" == "Create new session: $1" ]]; then
+    echo "$1"
+  else
+    echo "$selected"
+  fi
+}
+
 if [[ $# -eq 1 ]]; then
-  selected=$1
-  _pwd=$(pwd)
-  session_dir=$(basename "$_pwd" | tr . _)
+  selected=$(partial-match-search "$1")
+  session_dir=$(pwd)
 else
   session_dir=$(find $HOME $PERSONAL $CONFIG -mindepth 1 -maxdepth 1 -type d | fzf)
   if [[ -z $session_dir ]]; then
