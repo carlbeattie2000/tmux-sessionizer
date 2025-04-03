@@ -22,7 +22,7 @@ switch-session() {
 }
 
 has-session() {
-  tmux list-sessions | grep -q "^$1:"
+  tmux list-sessions | awk -F: '{print $1}' | grep -m1 "$1" > /dev/null
 }
 
 # Populate tmux session with windows
@@ -36,14 +36,22 @@ create-windows() {
 
   tmux new-window -t $1 -dn 'long-running' -c $2
   tmux new-window -t $1 -dn 'cmd' -c $2
-  tmux new-window -t $1 -dn 'exta' -c $2
+  tmux new-window -t $1 -dn 'extra' -c $2
 }
 
-session_dir=$(find $HOME $PERSONAL $CONFIG -mindepth 1 -maxdepth 1 -type d | fzf)
-if [[ -z $session_dir ]]; then
-  exit 0
+if [[ $# -eq 1 ]]; then
+  selected=$1
+  _pwd=$(pwd)
+  session_dir=$(basename "$_pwd" | tr . _)
+else
+  session_dir=$(find $HOME $PERSONAL $CONFIG -mindepth 1 -maxdepth 1 -type d | fzf)
+  if [[ -z $session_dir ]]; then
+    exit 0
+  fi
+  selected=$session_dir
 fi
-session_name=$(basename "$session_dir" | tr . _)
+
+session_name=$(basename "$selected" | tr . _)
 
 if ! tmux-active; then
   tmux new-session -ds $session_name -c $session_dir
