@@ -19,7 +19,7 @@ You could add more DIRs to look through here:
 session_dir=$(find $HOME $PERSONAL $CONFIG -mindepth 1 -maxdepth 1 -type d | fzf)
 ```
 
-Adding to shell as a keybind example, I am using `zsh` on linux:
+Adding to shell as a keybind example, I am using `zsh` on MacOS:
 ```bash
 # .zshrc
 export tmux_sessionizer="/usr/local/bin/tmux-sessionizer"
