@@ -2,9 +2,11 @@
 
 ### Everything fuzzy
 
-`tmux-sessionizer # Fuzzy find directory and start session`
-`tmux-sessionizer [<partial session name>]`
-`tmux-sessionizer -s # Fuzzy find sessions by name`
+```bash
+tmux-sessionizer # Fuzzy find directory and start session
+tmux-sessionizer [<partial session name>]
+tmux-sessionizer -s # Fuzzy find sessions by name
+```
 
 You can change the DIRs fzf looks through here:
 ```bash
