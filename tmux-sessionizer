@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+FLAG_FZF_ACTIVE_SESSIONS=0
+
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    -s) FLAG_FZF_ACTIVE_SESSIONS=1; shift ;;
+    *) break ;;
+  esac
+done
+
 HOME=~/
 PERSONAL=~/personal
 CONFIG=~/.config
@@ -49,6 +58,11 @@ partial-match-search() {
     echo "$selected"
   fi
 }
+
+if [[ $FLAG_FZF_ACTIVE_SESSIONS -eq 1 ]] && tmux-active; then
+  switch-session $(tmux list-sessions | awk -F: '{print $1}' | fzf)
+  exit 0
+fi
 
 if [[ $# -eq 1 ]]; then
   selected=$(partial-match-search "$1")
