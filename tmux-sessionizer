@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
 FLAG_FZF_ACTIVE_SESSIONS=0
+FLAG_FROM_CURRENT_DIR=0
 
 while [[ "$#" -gt 0 ]]; do
   case $1 in
     -s) FLAG_FZF_ACTIVE_SESSIONS=1; shift ;;
+    -c) FLAG_FROM_CURRENT_DIR=1; shift ;;
     *) break ;;
   esac
 done
@@ -68,7 +70,12 @@ if [[ $# -eq 1 ]]; then
   selected=$(partial-match-search "$1")
   session_dir=$(pwd)
 else
-  session_dir=$(find $HOME $PERSONAL $CONFIG -mindepth 1 -maxdepth 1 -type d | fzf)
+  if [[ $FLAG_FROM_CURRENT_DIR -eq 1 ]]; then
+    session_dir=$(find $(pwd) -mindepth 1 -maxdepth 1 -type d | fzf)
+  else
+    session_dir=$(find $HOME $PERSONAL $CONFIG -mindepth 1 -maxdepth 1 -type d | fzf)
+  fi
+
   if [[ -z $session_dir ]]; then
     exit 0
   fi
