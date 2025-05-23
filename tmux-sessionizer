@@ -13,6 +13,7 @@ done
 
 HOME=~/
 PERSONAL=~/personal
+WORK=~/work
 CONFIG=~/.config
 
 tmux-active() {
@@ -73,7 +74,7 @@ else
   if [[ $FLAG_FROM_CURRENT_DIR -eq 1 ]]; then
     session_dir=$(find $(pwd) -mindepth 1 -maxdepth 1 -type d | fzf)
   else
-    session_dir=$(find $HOME $PERSONAL $CONFIG -mindepth 1 -maxdepth 1 -type d | fzf)
+    session_dir=$(find $HOME $PERSONAL $WORK $CONFIG -mindepth 1 -maxdepth 1 -type d | fzf)
   fi
 
   if [[ -z $session_dir ]]; then
